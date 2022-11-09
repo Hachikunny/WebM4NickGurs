@@ -11,21 +11,21 @@ vidwebm -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [-w 
 ```
 
 ```
--i, --input				Input video.
+-i, --input			Input video.
 -o, --output			Output video
--l, --limit				Size limit (in MB, default 4MB)
--a, --audio				Enable audio in output video
+-l, --limit			Size limit (in MB, default 4MB)
+-a, --audio			Enable audio in output video
 -b, --bitrate			Output audio bitrate (in kbps, default 96kbps)
--s, --start				Start point
--e, --end				End point
--w, --width				Width of output video
+-s, --start			Start point
+-e, --end			End point
+-w, --width			Width of output video
 -h, --height			Height of output video
 -j, --subtitles			Encode with embedded subtitles at the (optionally) specified track
--f, --frame-accurate	Enable frame-accurate seeking (slower)
+-f, --frame-accurate  	Enable frame-accurate seeking (slower)
 -r, --framerate			Change the output framerate
 -t, --threads			Specify number of threads to use (default 1)
 -1, --single-pass		Use single-pass instead of two-pass
--9, --vp9				Use VP9 instead of VP8 (slower)
+-9, --vp9			Use VP9 instead of VP8 (slower)
 -10, --high-depth		Use 10-bit depth (slower)
 -v, --verbose			Enable verbose command-line output
 ```
