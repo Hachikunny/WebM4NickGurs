@@ -24,7 +24,7 @@ vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [
 ```
 
 ```
--i, --input			Input video.
+-i, --input			Input video
 -o, --output			Output video
 -l, --limit			Size limit (in MB, default 4MB)
 -a, --audio			Enable audio in output video
