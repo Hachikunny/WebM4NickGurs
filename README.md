@@ -3,9 +3,15 @@
 
 4chan is a picky piece of shit and does not support x264, the most common codec. This program is a small wrapper for ffmpeg and common options neccessary for achieving the most quality out of the file size limit of 4chan.
 
-## Requiements
+## Requirements
 
 You need to have ffmpeg installed on your system and resolvable via ```$PATH/%PATH%```. If you want to burn embedded subtitles into your video, you must also have MKVToolNix installed.
+
+On Windows, this can be done via something like:
+
+```setx path "%path%;C:\Program Files\MKVToolNix;C:\%FFMPEG-DIR%"``` (I don't know where you downloaded ffmpeg)
+
+On Linux, just use a package manager. That should work without needing to fuck around with $PATH.
 
 All of the modules used in the program must also be installed on your system. If Python is in a good mood, the following should work to resolve any missing libraries:
 
