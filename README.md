@@ -7,6 +7,10 @@
 
 You need to have ffmpeg installed on your system and resolvable via ```$PATH/%PATH%```. If you want to burn embedded subtitles into your video, you must also have MKVToolNix installed.
 
+All of the modules used in the program must also be installed on your system. If Python is in a good mood, the following should work to resolve any missing libraries:
+
+```pip install av ```
+
 ## Usage
 
 ```
@@ -34,5 +38,5 @@ vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [
 ```
 ## Related
 
-[Find 4chan boards' filesize limits](https://api.4chan.org/boards.json)
+[Find 4chan boards' filesize limits](https://api.4chan.org/boards.json) (Sizes are given in bytes; divide by 2^20 to get MB)
 
