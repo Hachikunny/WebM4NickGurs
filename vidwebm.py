@@ -3,7 +3,6 @@
 import argparse, os.path, os, av, subprocess, re, shutil, sys
 
 # You also need ffmpeg (and also mkvtoolnix if you want to burn subtitles), and it has to be accessible via your $PATH/%PATH%. 
-    
 if not shutil.which("ffmpeg"):
     print("You are missing some dependencies (ffmpeg).", file=sys.stderr)
     sys.exit()
