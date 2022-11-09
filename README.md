@@ -3,11 +3,14 @@
 
 4chan is a picky piece of shit and does not support x264, the most common codec. This program is a small wrapper for ffmpeg and common options neccessary for achieving the most quality out of the file size limit of 4chan.
 
+## Requiements
+
+You need to have ffmpeg installed on your system and resolvable via ```$PATH/%PATH%```. If you want to burn embedded subtitles into your video, you must also have MKVToolNix installed.
 
 ## Usage
 
 ```
-vidwebm -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [-w WIDTH] [-h HEIGHT] [-j [TRACK]] [-f] [-r FRAMERATE] [-t THREADS] [-1] [-9] [-10] [-v]
+vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [-w WIDTH] [-h HEIGHT] [-j [TRACK]] [-f] [-r FRAMERATE] [-t THREADS] [-1] [-9] [-10] [-v]
 ```
 
 ```
