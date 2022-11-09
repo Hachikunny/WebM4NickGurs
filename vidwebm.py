@@ -2,10 +2,7 @@
 # You need to pip install all the shit on the following line if you do not already have it.
 import argparse, os.path, os, av, subprocess, re, shutil, sys
 
-# You also need these two programs, and they have to be accessible via your $PATH/%PATH%. 
-if not shutil.which("mkvextract"):
-    print("You are missing some dependencies (mkvtoolnix).", file=sys.stderr)
-    sys.exit()
+# You also need ffmpeg (and also mkvtoolnix if you want to burn subtitles), and it has to be accessible via your $PATH/%PATH%. 
     
 if not shutil.which("ffmpeg"):
     print("You are missing some dependencies (ffmpeg).", file=sys.stderr)
@@ -31,6 +28,10 @@ parser.add_argument("-j", "--subtitles", metavar="SUBTITLES", help="Encode with 
 parser.add_argument("-v", "--verbose", help="Enable verbose command-line output", action='store_true')
 
 args = parser.parse_args()
+
+if not shutil.which("mkvextract") and "subtitles" in args:
+    print("You are missing some dependencies (mkvtoolnix).", file=sys.stderr)
+    sys.exit()
 
 if not os.path.isfile(args.input):
     print("Invalid file.", file=sys.stderr)
