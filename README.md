@@ -1,7 +1,7 @@
 
 # WebM4NickGurs
 
-4chan is a picky piece of shit and does not support x264, the most common codec. This program is a small wrapper for ffmpeg and common options neccessary for achieving the most quality out of the file size limit of 4chan.
+4chan is a picky piece of shit and does not support x264, the most common codec. This program is a small wrapper for ffmpeg and preset with common options neccessary for achieving the most quality out of the file size limit of 4chan.
 
 ## Requirements
 
