@@ -21,7 +21,7 @@ vidwebm -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [-w 
 -w, --width			Width of output video
 -h, --height			Height of output video
 -j, --subtitles			Encode with embedded subtitles at the (optionally) specified track
--f, --frame-accurate  	  Enable frame-accurate seeking (slower)
+-f, --frame-accurate     	  Enable frame-accurate seeking (slower)
 -r, --framerate			Change the output framerate
 -t, --threads			Specify number of threads to use (default 1)
 -1, --single-pass		Use single-pass instead of two-pass
