@@ -29,8 +29,8 @@ vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [
 -l, --limit			Size limit (in MB, default 4MB)
 -a, --audio			Enable audio in output video
 -b, --bitrate			Output audio bitrate (in kbps, default 96kbps)
--s, --start			Start point
--e, --end			End point
+-s, --start			Start point (seconds)
+-e, --end			End point (seconds)
 -w, --width			Width of output video
 -h, --height			Height of output video
 -j, --subtitles			Encode with embedded subtitles at the (optionally) specified track
