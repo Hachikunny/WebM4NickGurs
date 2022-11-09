@@ -11,7 +11,7 @@ On Windows, this can be done via something like:
 
 ```setx path "%path%;C:\Program Files\MKVToolNix;C:\%FFMPEG-DIR%"``` (I don't know where you downloaded ffmpeg)
 
-On Linux, just use a package manager. That should work without needing to fuck around with $PATH.
+On Linux, just use a package manager. That should work without needing to fuck around with ```$PATH```.
 
 All of the modules used in the program must also be installed on your system. If Python is in a good mood, the following should work to resolve any missing libraries:
 
