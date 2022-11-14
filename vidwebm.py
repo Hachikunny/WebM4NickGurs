@@ -15,8 +15,8 @@ parser.add_argument("-o", "--output", metavar="OUTPUT", help="Output video", req
 parser.add_argument("-l", "--limit", metavar="SIZE_LIMIT", help="Size limit (in MB, default 4MB)", default=4.0, type=float)
 parser.add_argument("-a", "--audio", help="Enable audio in output video", action='store_true')
 parser.add_argument("-b", "--bitrate", metavar="BITRATE", help="Output audio bitrate (in kbps, default 96kbps)", default=96, type=int)
-parser.add_argument("-s", "--start", metavar="START", help="Start point", default=0.0, type=float)
-parser.add_argument("-e", "--end", metavar="END", help="End point", default=-1.0, type=float)
+parser.add_argument("-s", "--start", metavar="START", help="Start point", default=0.0)
+parser.add_argument("-e", "--end", metavar="END", help="End point", default=-1.0)
 parser.add_argument("-f", "--frame-accurate", help="Enable frame-accurate seeking (slower)", action='store_true')
 parser.add_argument("-r", "--framerate", help="Change the output framerate", type=int)
 parser.add_argument("-1", "--single-pass", help="Use single-pass instead of two-pass", action='store_true')
@@ -35,6 +35,20 @@ if not shutil.which("mkvextract") and "subtitles" in args:
 if not os.path.isfile(args.input):
     print("Invalid file.", file=sys.stderr)
     sys.exit()
+
+def timeParse(s):
+    time = 0.0
+    mult = 1
+    while len(s) > 0:
+        if s.rfind(":") != -1:
+            time += float(s[s.rfind(":") + 1:]) * mult
+            s = s[0:s.rfind(":")]
+            mult *= 60
+        else:
+            time += float(s) * mult
+            s = ""
+    return time
+
 avid = av.open(args.input)
 duration = avid.duration // 1_000_000
 avid.close()
@@ -42,22 +56,26 @@ size = args.limit * 1024 * 8
 
 command = ["ffmpeg", "-y"]
 
+start = timeParse(str(args.start))
+if args.end != -1.0:
+    end = timeParse(args.end)
+
 if args.frame_accurate:
     command.append("-i")
     command.append(args.input)
     command.append("-ss")
-    command.append(str(args.start))
+    command.append(str(start))
     if args.end != -1.0:
         command.append("-to")
-        command.append(str(args.end))
+        command.append(str(end))
 else:
     command.append("-ss")
-    command.append(str(args.start))
+    command.append(str(start))
     command.append("-i")
     command.append(args.input)
     if args.end != -1.0:
         command.append("-to")
-        command.append(str((args.end - args.start)))
+        command.append(str((end - start)))
 if args.framerate:
     command += (f"-r {str(args.framerate)}".split())
 
@@ -67,19 +85,24 @@ vf = ""
 ext = ""
 
 if "subtitles" in args:
-    p = subprocess.run(["mkvinfo", args.input], capture_output=True)
+    if args.verbose:
+        print(*["mkvinfo", args.input], sep=" ")
+        p = subprocess.run(["mkvinfo", args.input], capture_output=True)
+        print(p.stdout.decode())
+    else:
+        p = subprocess.run(["mkvinfo", args.input], capture_output=True)
     t = p.stdout.decode()
     no = args.subtitles
     codec = None
     while len(t) > 0:
-        start = t.find("| + Track")
-        end = t[start+1:].find("| + Track")
-        if end == -1:
-            sub = t[start:]
+        tstart = t.find("| + Track")
+        tend = t[tstart+1:].find("| + Track")
+        if tend == -1:
+            sub = t[tstart:]
             t = ""
         else:
-            sub = t[start:start+1+end]
-            t = t[start+1+end:]
+            sub = t[tstart:tstart+1+tend]
+            t = t[tstart+1+tend:]
         if no and int(re.search("track ID for mkvmerge & mkvextract: (\\d+)", sub).group(1)) == no:
             codec = re.search("Codec ID: ([A-Za-z0-9_/]*)", sub).group(1)
             break
@@ -96,8 +119,17 @@ if "subtitles" in args:
         elif codec == "S_TEXT/UTF8":
             ext = "srt"
         if len(ext) > 0:
-            subprocess.run(["mkvextract", args.input, "tracks", f"{no}:temporary-script.{ext}"], capture_output=True)
-            p = subprocess.run(["mkvmerge", "-i", args.input], capture_output=True)
+            if args.verbose:
+                print(*["mkvextract", args.input, "tracks", f"{no}:temporary-script.{ext}"], sep=" ")
+                subprocess.run(["mkvextract", args.input, "tracks", f"{no}:temporary-script.{ext}"])
+            else:
+                subprocess.run(["mkvextract", args.input, "tracks", f"{no}:temporary-script.{ext}"], capture_output=True)
+            if args.verbose:
+                print(*["mkvmerge", "-i", args.input], sep=" ")
+                p = subprocess.run(["mkvmerge", "-i", args.input], capture_output=True)
+                print(p.stdout.decode())
+            else:
+                p = subprocess.run(["mkvmerge", "-i", args.input], capture_output=True)
             mx = 0
             if p.stdout.decode().rfind("Attachment ID ") != -1:
                 mx = int(re.search("Attachment ID (\\d+)", p.stdout.decode()[p.stdout.decode().rfind("Attachment ID"):]).group(1))
@@ -106,12 +138,20 @@ if "subtitles" in args:
                 tlist = []
                 for x in range(mx):
                     tlist.append(str(x+1))
-                subprocess.run(["mkvextract", "attachments", args.input] + tlist, cwd="temporary-fonts", capture_output=True)
-            seek = f"ffmpeg -y -i temporary-script.{ext} -ss {str(args.start)} "
+                if args.verbose:
+                    print(*(["mkvextract", "attachments", args.input] + tlist), sep=" ")
+                    subprocess.run(["mkvextract", "attachments", args.input] + tlist, cwd="temporary-fonts")
+                else:
+                    subprocess.run(["mkvextract", "attachments", args.input] + tlist, cwd="temporary-fonts", capture_output=True)
+            seek = f"ffmpeg -y -i temporary-script.{ext} -ss {str(start)} "
             if args.end != -1:
-                seek += f"-to {str(args.end)} "
+                seek += f"-to {str(end)} "
             seek += f"temporary-script-seek.{ext}"
-            subprocess.run(seek.split(), capture_output=True)
+            if args.verbose:
+                print(seek, sep=" ")
+                subprocess.run(seek.split())
+            else:
+                subprocess.run(seek.split(), capture_output=True)
             vf += f"{ext}=temporary-script-seek.{ext}:fontsdir=./temporary-fonts/"
         else:
             print("Failed to find embedded subtitles", file=sys.stderr)
@@ -127,17 +167,16 @@ if len(vf) > 0:
     command.append("-vf")
     command.append(vf)
 
-command.append("-map")
-command.append("0:v:0")
+command += ("-map 0:v:0".split())
 
 if args.end != -1:
     if args.audio:
-        size -= args.bitrate * (args.end - args.start)
-    bitrate = size / (args.end - args.start)
+        size -= args.bitrate * (end - start)
+    bitrate = size / (end - start)
 else:
     if args.audio:
-        size -= args.bitrate * (duration - args.start)
-    bitrate = size / (duration - args.start)
+        size -= args.bitrate * (duration - start)
+    bitrate = size / (duration - start)
 command += ("-map 0:a:0".split())
 command.append("-pix_fmt")
 if args.high_depth:
@@ -160,7 +199,10 @@ if args.vp9:
             command += (f"-c:a libopus -b:a {args.bitrate}k".split())
         else:
             command.append("-an")
-        command.append(args.output)
+        if args.output[-5:] == ".webm":
+            command.append(args.output)
+        else:
+            command.append(args.output + ".webm")
         if args.verbose:
             print(*command, sep=" ")
             subprocess.run(command)
@@ -171,7 +213,10 @@ if args.vp9:
             command += (f"-c:a libopus -b:a {args.bitrate}k".split())
         else:
             command.append("-an")
-        command.append(args.output)
+        if args.output[-5:] == ".webm":
+            command.append(args.output)
+        else:
+            command.append(args.output + ".webm")
         if args.verbose:
             print(*command, sep=" ")
             subprocess.run(command)
@@ -193,7 +238,10 @@ else:
             command += (f"-c:a libvorbis -b:a {args.bitrate}k".split())
         else:
             command.append("-an")
-        command.append(args.output)
+        if args.output[-5:] == ".webm":
+            command.append(args.output)
+        else:
+            command.append(args.output + ".webm")
         if args.verbose:
             print(*command, sep=" ")
             subprocess.run(command)
@@ -204,7 +252,10 @@ else:
             command += (f"-c:a libvorbis -b:a {args.bitrate}k".split())
         else:
             command.append("-an")
-        command.append(args.output)
+        if args.output[-5:] == ".webm":
+            command.append(args.output)
+        else:
+            command.append(args.output + ".webm")
         if args.verbose:
             print(*command, sep=" ")
             subprocess.run(command)
