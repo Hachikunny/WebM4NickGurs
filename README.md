@@ -40,7 +40,7 @@ vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [
 -1, --single-pass		Use single-pass instead of two-pass
 -9, --vp9			Use VP9 instead of VP8 (slower)
 -10, --high-depth		Use 10-bit depth (slower)
--x, --board,                    Automatically select a filesize limit based on a board name
+-x, --board                     Automatically select a filesize limit based on a board name
 -v, --verbose			Enable verbose command-line output
 ```
 ## Related
