@@ -24,6 +24,7 @@ parser.add_argument("-9", "--vp9", help="Use VP9 instead of VP8 (slower)", actio
 parser.add_argument("-10", "--high-depth", help="Use 10-bit depth (slower)", action='store_true')
 parser.add_argument("-t", "--threads", metavar="THREADS", help="Specify number of threads to use (default 1)", default=1, type=int)
 parser.add_argument("-j", "--subtitles", metavar="SUBTITLES", help="Encode with embedded subtitles at the specified track", type=int, nargs="?", default=argparse.SUPPRESS)
+parser.add_argument("-x", "--board", metavar="BOARD", help="Automatically select a filesize limit based on a board name", type=str)
 parser.add_argument("-v", "--verbose", help="Enable verbose command-line output", action='store_true')
 
 args = parser.parse_args()
@@ -49,10 +50,14 @@ def timeParse(s):
             s = ""
     return time
 
+board_sizes = {"3":3, "a":3, "aco":3, "adv":3, "an":3, "b":2, "bant":2, "biz":3, "c":3, "cgl":3, "ck":3, "cm":3, "co":3, "d":3, "diy":3, "e":3, "f":3, "fa":3, "fit":3, "g":3, "gd":3, "gif":4, "h":3, "hc":3, "his":3, "hm":3, "hr":3, "i":3, "ic":3, "int":3, "jp":3, "k":3, "lgbt":3, "lit":3, "m":3, "mlp":3, "mu":3, "n":3, "news":3, "o":3, "out":3, "p":3, "po":3, "pol":3, "pw":3, "qa":3, "qst":3, "r":3, "r9k":3, "s":3, "s4s":3, "sci":3, "soc":3, "sp":3, "t":3, "tg":3, "toy":3, "trash":3, "trv":3, "tv":3, "u":3, "v":3, "vg":3, "vip":3, "vm":3, "vmg":3, "vp":3, "vr":3, "vrpg":3, "vst":3, "vt":3, "w":3, "wg":3, "wsg":6, "wsr":3, "x":3, "xs":3, "y":3}
+
 avid = av.open(args.input)
 duration = avid.duration // 1_000_000
 avid.close()
 size = args.limit * 1024 * 8
+if args.board:
+    size = board_sizes[args.board.lower()] * 1024 * 8
 
 command = ["ffmpeg", "-y"]
 
