@@ -10,11 +10,11 @@ if not shutil.which("ffmpeg"):
 parser = argparse.ArgumentParser(description='Convert videos to 4chan compliant webms.', conflict_handler="resolve")
 parser.add_argument("-w", "--width", metavar="WIDTH", help="Width of output video", type=int, default=-1)
 parser.add_argument("-h", "--height", metavar="HEIGHT", help="Height of output video", type=int, default=-1)
-parser.add_argument("-i", "--input", metavar="INPUT", help="Input video.", required=True)
+parser.add_argument("-i", "--input", metavar="INPUT", help="Input video", required=True)
 parser.add_argument("-o", "--output", metavar="OUTPUT", help="Output video", required=True)
+parser.add_argument("-b", "--board", metavar="BOARD", help="Automatically select a filesize limit based on a board name", type=str)
 parser.add_argument("-l", "--limit", metavar="SIZE_LIMIT", help="Size limit (in MB, default 4MB)", default=4.0, type=float)
-parser.add_argument("-a", "--audio", help="Enable audio in output video", action='store_true')
-parser.add_argument("-b", "--bitrate", metavar="BITRATE", help="Output audio bitrate (in kbps, default 96kbps)", default=96, type=int)
+parser.add_argument("-a", "--audio", help="Enable audio in output video, optionally specify bitrate (default 64kbps)", type=int, nargs="?", default=argparse.SUPPRESS)
 parser.add_argument("-s", "--start", metavar="START", help="Start point", default=0.0)
 parser.add_argument("-e", "--end", metavar="END", help="End point", default=-1.0)
 parser.add_argument("-f", "--frame-accurate", help="Enable frame-accurate seeking (slower)", action='store_true')
@@ -24,7 +24,6 @@ parser.add_argument("-9", "--vp9", help="Use VP9 instead of VP8 (slower)", actio
 parser.add_argument("-10", "--high-depth", help="Use 10-bit depth (slower)", action='store_true')
 parser.add_argument("-t", "--threads", metavar="THREADS", help="Specify number of threads to use (default 1)", default=1, type=int)
 parser.add_argument("-j", "--subtitles", metavar="SUBTITLES", help="Encode with embedded subtitles at the specified track", type=int, nargs="?", default=argparse.SUPPRESS)
-parser.add_argument("-x", "--board", metavar="BOARD", help="Automatically select a filesize limit based on a board name", type=str)
 parser.add_argument("-v", "--verbose", help="Enable verbose command-line output", action='store_true')
 
 args = parser.parse_args()
@@ -174,13 +173,18 @@ if len(vf) > 0:
 
 command += ("-map 0:v:0".split())
 
+abitrate = 64
 if args.end != -1:
-    if args.audio:
-        size -= args.bitrate * (end - start)
+    if "audio" in args:
+        if args.audio:
+            abitrate = args.audio
+        size -= abitrate * (end - start)
     bitrate = size / (end - start)
 else:
-    if args.audio:
-        size -= args.bitrate * (duration - start)
+    if "audio" in args:
+        if args.audio:
+            abitrate = args.audio
+        size -= abitrate * (duration - start)
     bitrate = size / (duration - start)
 command += ("-map 0:a:0".split())
 command.append("-pix_fmt")
@@ -200,8 +204,8 @@ if args.vp9:
         else:
             subprocess.run(command1, capture_output=True)
         command += ("-pass 2".split())
-        if args.audio:
-            command += (f"-c:a libopus -b:a {args.bitrate}k".split())
+        if "audio" in args:
+            command += (f"-c:a libopus -b:a {abitrate}k".split())
         else:
             command.append("-an")
         if args.output[-5:] == ".webm":
@@ -214,8 +218,8 @@ if args.vp9:
         else:
             subprocess.run(command, capture_output=True)
     else:
-        if args.audio:
-            command += (f"-c:a libopus -b:a {args.bitrate}k".split())
+        if "audio" in args:
+            command += (f"-c:a libopus -b:a {abitrate}k".split())
         else:
             command.append("-an")
         if args.output[-5:] == ".webm":
@@ -239,8 +243,8 @@ else:
         else:
             subprocess.run(command1, capture_output=True)
         command += ("-pass 2".split())
-        if args.audio:
-            command += (f"-c:a libvorbis -b:a {args.bitrate}k".split())
+        if "audio" in args:
+            command += (f"-c:a libvorbis -b:a {abitrate}k".split())
         else:
             command.append("-an")
         if args.output[-5:] == ".webm":
@@ -253,8 +257,8 @@ else:
         else:
             subprocess.run(command, capture_output=True)
     else:
-        if args.audio:
-            command += (f"-c:a libvorbis -b:a {args.bitrate}k".split())
+        if "audio" in args:
+            command += (f"-c:a libvorbis -b:a {abitrate}k".split())
         else:
             command.append("-an")
         if args.output[-5:] == ".webm":
