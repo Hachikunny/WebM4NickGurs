@@ -20,15 +20,15 @@ All of the modules used in the program must also be installed on your system. If
 ## Usage
 
 ```
-vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [-w WIDTH] [-h HEIGHT] [-j [TRACK]] [-f] [-r FRAMERATE] [-t THREADS] [-1] [-9] [-10] [-v]
+vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a [BITRATE]] [-b BOARD] [-s START] [-e END] [-w WIDTH] [-h HEIGHT] [-j [TRACK]] [-f] [-r FRAMERATE] [-t THREADS] [-1] [-9] [-10] [-v]
 ```
 
 ```
 -i, --input			Input video
 -o, --output			Output video
+-b, --board                     Automatically select a filesize limit based on a board name
 -l, --limit			Size limit (in MB, default 4MB)
--a, --audio			Enable audio in output video
--b, --bitrate			Output audio bitrate (in kbps, default 96kbps)
+-a, --audio			Enable audio in output video, optionally specify audio bitrate (in kbps, default 64kbps)
 -s, --start			Start point (seconds)
 -e, --end			End point (seconds)
 -w, --width			Width of output video
@@ -40,7 +40,6 @@ vidwebm.py -i INPUT -o OUTPUT [-l LIMIT] [-a] [-b BITRATE] [-s START] [-e END] [
 -1, --single-pass		Use single-pass instead of two-pass
 -9, --vp9			Use VP9 instead of VP8 (slower)
 -10, --high-depth		Use 10-bit depth (slower)
--x, --board                     Automatically select a filesize limit based on a board name
 -v, --verbose			Enable verbose command-line output
 ```
 ## Related
